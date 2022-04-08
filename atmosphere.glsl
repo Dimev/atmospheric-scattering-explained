@@ -157,12 +157,6 @@ vec3 calculate_scattering(
     // initialize the optical depth. This is used to calculate how much air was in the ray
     vec3 opt_i = vec3(0.0);
     
-    // we define the density early, as this helps doing integration
-    // usually we would do riemans summing, which is just the squares under the integral area
-    // this is a bit innefficient, and we can make it better by also taking the extra triangle at the top of the square into account
-    // the starting value is a bit inaccurate, but it should make it better overall
-    vec3 prev_density = vec3(0.0);
-    
     // also init the scale height, avoids some vec2's later on
     vec2 scale_height = vec2(height_ray, height_mie);
     
@@ -198,12 +192,8 @@ vec3 calculate_scattering(
         density *= step_size_i;
         
         // Add these densities to the optical depth, so that we know how many particles are on this ray.
-        // max here is needed to prevent opt_i from potentially becoming negative
-        opt_i += max(density + (prev_density - density) * 0.5, 0.0);
+        opt_i += density;
         
-        // and update the previous density
-        prev_density = density;
-
         // Calculate the step size of the light ray.
         // again with a ray sphere intersect
         // a, b, c and d are already defined
@@ -222,10 +212,7 @@ vec3 calculate_scattering(
 
         // and the optical depth of this ray
         vec3 opt_l = vec3(0.0);
-        
-        // again, use the prev density for better integration
-        vec3 prev_density_l = vec3(0.0);
-        
+            
         // now sample the light ray
         // this is similar to what we did before
         for (int l = 0; l < steps_l; ++l) {
@@ -249,11 +236,8 @@ vec3 calculate_scattering(
             density_l *= step_size_l;
             
             // and add it to the total optical depth
-            opt_l += max(density_l + (prev_density_l - density_l) * 0.5, 0.0);
+            opt_l += density_l;
             
-            // and update the previous density
-            prev_density_l = density_l;
-
             // and increment where we are along the light ray.
             ray_pos_l += step_size_l;
             
