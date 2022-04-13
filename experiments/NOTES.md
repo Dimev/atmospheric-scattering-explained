@@ -25,6 +25,7 @@ where `theta` is the angle between the view ray and up
 
 Further investigation tells me this is probably similar to `-1 / (x - 2)`, 
 with the points at x = -1 and x = 1 set to the optical depth when looking up and down respectively
+NOTE: this is not steep enough near 0, so might need some extras. Mayab try pade approximation?
 
 I'm not entirely sure how to properly handle the proper optical depth via light yet, 
 and Jodie does this with the integral of `exp(-a * x - b * (1 - x))` with x from 0 to 1,
